@@ -10,17 +10,12 @@ from datetime import datetime as dt
 from streamlit_keplergl import keplergl_static
 import seaborn as sns
 ########################### Initial settings for the dashboard ##################################################################
-DATA_CONFIG = {
-    'chunk_size': 10000,  # Process data in chunks for better memory management
-    'cache_timeout': 3600,  # Cache data for 1 hour to improve performance
-    'max_memory_usage': '500MB'  # Prevent memory overflow
-}
 st.set_page_config(page_title = 'Citi Bike Strategy Dashboard', layout='wide')
 st.title("Citi Bike Strategy Dashboard")
 st.markdown("This dashboard aims to look at the potential reasons behind Citi Bike customers' complaints about bikes not being available at certain times.")
 ########################## Import data ###########################################################################################
 
-df = pd.read_csv('red.csv', index_col = 0)
+df = pd.read_csv('NY_weather.csv', index_col = 0)
 top20 = pd.read_csv('top20.csv', index_col = 0)
 # ######################################### DEFINE THE CHARTS #####################################################################
 ## Bar chart
@@ -35,17 +30,28 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width = True)
 
 ## Line chart 
-fig_2,ax = plt.subplots(figsize=(10, 5))
+fig_2 = make_subplots(specs = [[{"secondary_y": True}]])
 
-sns.lineplot(data = df['bike_rides_daily'], color = "b")
-ax.set_xlabel("Year 2022", fontsize = 14)
-ax.set_ylabel("Bike rides daily", color = "navy", fontsize = 14)
+fig_2.add_trace(
+    go.Scatter(x = df['date'], y = df['bike_rides_daily'], name = 'Daily bike rides', 
+               marker={'color': 'blue'}),
+    secondary_y = False
+)
 
-ax2 = ax.twinx()
+fig_2.add_trace(
+    go.Scatter(x=df['date'], y = df['avgTemp'], name = 'Daily temperature', 
+               marker={'color': 'red'}),
+    secondary_y=True
+)
 
-sns.lineplot(data = df["avgTemp"], color = "r", ax=ax2)
-ax2.set_ylabel("Average temperatures", color = "red", fontsize=14)
-plt.title('Temperature and trips in 2022', fontsize = 18)
+fig_2.update_layout(
+    title_text="Daily Bike Rides and Temperature",
+    xaxis_title="Date",
+)
+
+# Update y-axis titles (primary and secondary)
+fig_2.update_yaxes(title_text="Number of Bike Rides", secondary_y=False)  # Primary y-axis label
+fig_2.update_yaxes(title_text="Temperature (°C)", secondary_y=True)  # Secondary y-axis label
 
 st.plotly_chart(fig_2, use_container_width=True)
 ### Add the map  ###
