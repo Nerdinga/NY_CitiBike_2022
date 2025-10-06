@@ -1,0 +1,4 @@
+plotly == 6.0.1streamlit == 1.47.0matplotlib == 3.10.0streamlit_keplergl == 0.3.0numerize == 0.12pillow == 11.0.0
+pandas == 2.3.2
+numpy == 1.26.4
+seaborn == 0.13.2
